@@ -27,3 +27,7 @@ Visita `http://localhost:8080`.
 W00 invitación → W01 panel de hoy → W02 recordatorios → W03 creación → W04 detalle → W05 edición. W06 alertas → W07 detalle de alerta. W08 acceso y permisos. La sección «Sistema visual» presenta los componentes y estados utilizados.
 
 Los formularios actualizan la maqueta de forma local. La búsqueda, filtros, pestañas y diálogos responden a la interacción. Llamadas, mensajes y sincronización son simulados: no contactan a nadie ni confirman una actividad en nombre de Elena.
+
+## Pruebas realizadas
+
+Se recorrieron W00–W08 y la pantalla del sistema visual en navegador sin errores de JavaScript. También se probaron la creación y edición de recordatorios, búsqueda, filtros, pestañas y el formulario de registro de contacto. Los datos guardados permanecen en el almacenamiento local del mismo navegador; no se sincronizan con la aplicación Android.

@@ -21,4 +21,4 @@ Consulta los README de cada carpeta para ejecutar y compilar. Navega desde el me
 
 ## Estado de la entrega
 
-Se incluye un APK de depuración firmado en `mobile/apk/A-Tiempo-debug.apk`, con `minSdkVersion 27`. La firma y el manifiesto fueron verificados; falta probar su instalación y navegación en un dispositivo o emulador Android real antes de entregar. No se incluyen credenciales, datos de pacientes ni integración real.
+Se incluye un APK de depuración firmado en `mobile/apk/A-Tiempo-debug.apk`, con `minSdkVersion 27`. Se verificaron la firma, el manifiesto y las pantallas del prototipo; el propietario del proyecto confirmó que instaló el APK y navegó por la aplicación en su celular Android. La web se probó en navegador con sus rutas y controles principales. No se incluyen credenciales, datos de pacientes ni integración real.

@@ -31,7 +31,7 @@ El script crea `apk/A-Tiempo-debug.apk` y verifica su firma. Como alternativa:
 
 También puedes ejecutar `gradle assembleDebug` si Gradle 8.9 está instalado.
 
-El APK incluido pasó verificación de firma y manifiesto. No había un emulador ni dispositivo conectado durante esta sesión, por lo que aún falta una prueba de instalación y navegación en hardware Android antes de entregar.
+El APK incluido pasó verificación de firma y manifiesto. Se recorrieron M01–M14 y el sistema visual en navegador sin errores de JavaScript; se probaron los flujos principales de creación y confirmación. El propietario del proyecto confirmó que instaló el APK y navegó por la aplicación en su celular Android. Las funciones de llamadas, invitaciones y sincronización continúan siendo simuladas.
 
 ## Flujo
 
