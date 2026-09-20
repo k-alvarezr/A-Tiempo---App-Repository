@@ -12,26 +12,9 @@ La tipografía Atkinson Hyperlegible Next se incluye localmente para uso sin con
 - `compileSdk` 35, `targetSdk` 35, `minSdk` 27 (Android 8.1)
 - Android Studio con SDK 35 y Build Tools instalados
 
-## Ejecutar y generar APK
+## Ejecutar APK
 
 El APK de depuración verificado se encuentra en [`apk/A-Tiempo-debug.apk`](apk/A-Tiempo-debug.apk). Puede instalarse en Android API 27 o superior. La firma es de depuración: no es adecuada para publicar en Google Play.
-
-Para compilarlo en Windows sin Gradle, instala Java 17, Android SDK Platform 35 y Build Tools 35.0.0, y ejecuta:
-
-```powershell
-./build-apk.ps1 -SdkRoot 'C:\ruta\Android\Sdk' -JdkHome 'C:\ruta\jdk-17'
-```
-
-El script crea `apk/A-Tiempo-debug.apk` y verifica su firma. Como alternativa:
-
-1. Abre la carpeta `mobile/` en Android Studio.
-2. Sincroniza el proyecto con Gradle 8.9 y SDK 35.
-3. Ejecuta `app` en un emulador o dispositivo con Android API 27 o superior.
-4. Usa **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
-
-También puedes ejecutar `gradle assembleDebug` si Gradle 8.9 está instalado.
-
-El APK incluido pasó verificación de firma y manifiesto. Se recorrieron M01–M14 y el sistema visual en navegador sin errores de JavaScript; se probaron los flujos principales de creación y confirmación. El propietario del proyecto confirmó que instaló el APK y navegó por la aplicación en su celular Android. Las funciones de llamadas, invitaciones y sincronización continúan siendo simuladas.
 
 ## Flujo
 
