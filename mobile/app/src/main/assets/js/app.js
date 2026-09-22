@@ -1,62 +1,483 @@
 /* A Tiempo · prototipo Android sin servicios externos. */
 (() => {
   'use strict';
-  const $=s=>document.querySelector(s);
-  const symbols={home:'<path d="m3 10 9-7 9 7v10H3V10Z"/><path d="M9 20v-7h6v7"/>',list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',people:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6m2 9v-2a6 6 0 0 0-3-5"/>',plus:'<path d="M12 5v14M5 12h14"/>',back:'<path d="m15 18-6-6 6-6M9 12h12"/>',check:'<path d="m4 12 5 5L20 6"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',edit:'<path d="M4 20h4l12-12-4-4L4 16v4Zm10-14 4 4"/>',shield:'<path d="M12 2 4 5v6c0 5 3.3 8.7 8 11 4.7-2.3 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/>',info:'<circle cx="12" cy="12" r="10"/><path d="M12 11v6m0-10h.01"/>',water:'<path d="M12 2C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-13Z"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/>',volume:'<path d="M3 9v6h4l5 4V5L7 9H3Zm13-1a6 6 0 0 1 0 8m2-11a10 10 0 0 1 0 14"/>',pause:'<path d="M7 5h3v14H7zm7 0h3v14h-3z"/>',trash:'<path d="M4 7h16M10 3h4m-8 4 1 14h10l1-14M10 11v6m4-6v6"/>'};
-  const icon=(n)=>`<svg viewBox="0 0 24 24" aria-hidden="true">${symbols[n]||symbols.info}</svg>`;
-  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const defaults=[
-    {id:1,title:'Tomar medicamento de la mañana',time:'08:00',note:'Con un vaso de agua después del desayuno',category:'Medicamento',status:'Pendiente',frequency:'Diaria'},
-    {id:2,title:'Caminata matutina',time:'07:00',note:'Paseo suave y relajante',category:'Actividad diaria',status:'Hecha',frequency:'Diaria'},
-    {id:3,title:'Beber agua',time:'13:00',note:'Tomar un vaso grande de agua fresca',category:'Hogar o personal',status:'Pendiente',frequency:'Diaria'},
-    {id:4,title:'Tomar medicamento de la tarde',time:'16:30',note:'Tomar con medio vaso de agua',category:'Medicamento',status:'Pospuesta',frequency:'Diaria'}
+  const $ = (s) => document.querySelector(s);
+  const symbols = {
+    home: '<path d="m3 10 9-7 9 7v10H3V10Z"/><path d="M9 20v-7h6v7"/>',
+    list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+    bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
+    people:
+      '<circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6m2 9v-2a6 6 0 0 0-3-5"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    back: '<path d="m15 18-6-6 6-6M9 12h12"/>',
+    check: '<path d="m4 12 5 5L20 6"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    edit: '<path d="M4 20h4l12-12-4-4L4 16v4Zm10-14 4 4"/>',
+    shield:
+      '<path d="M12 2 4 5v6c0 5 3.3 8.7 8 11 4.7-2.3 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/>',
+    info: '<circle cx="12" cy="12" r="10"/><path d="M12 11v6m0-10h.01"/>',
+    water: '<path d="M12 2C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-13Z"/>',
+    calendar:
+      '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/>',
+    volume:
+      '<path d="M3 9v6h4l5 4V5L7 9H3Zm13-1a6 6 0 0 1 0 8m2-11a10 10 0 0 1 0 14"/>',
+    pause: '<path d="M7 5h3v14H7zm7 0h3v14h-3z"/>',
+    trash: '<path d="M4 7h16M10 3h4m-8 4 1 14h10l1-14M10 11v6m4-6v6"/>',
+  };
+  const icon = (n) =>
+    `<svg viewBox="0 0 24 24" aria-hidden="true">${symbols[n] || symbols.info}</svg>`;
+  const esc = (v) =>
+    String(v ?? '').replace(
+      /[&<>"']/g,
+      (c) =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+    );
+  const defaults = [
+    {
+      id: 1,
+      title: 'Tomar medicamento de la mañana',
+      time: '08:00',
+      note: 'Con un vaso de agua después del desayuno',
+      category: 'Medicamento',
+      status: 'Pendiente',
+      frequency: 'Diaria',
+    },
+    {
+      id: 2,
+      title: 'Caminata matutina',
+      time: '07:00',
+      note: 'Paseo suave y relajante',
+      category: 'Actividad diaria',
+      status: 'Hecha',
+      frequency: 'Diaria',
+    },
+    {
+      id: 3,
+      title: 'Beber agua',
+      time: '13:00',
+      note: 'Tomar un vaso grande de agua fresca',
+      category: 'Hogar o personal',
+      status: 'Pendiente',
+      frequency: 'Diaria',
+    },
+    {
+      id: 4,
+      title: 'Tomar medicamento de la tarde',
+      time: '16:30',
+      note: 'Tomar con medio vaso de agua',
+      category: 'Medicamento',
+      status: 'Pospuesta',
+      frequency: 'Diaria',
+    },
   ];
-  let saved;try{saved=JSON.parse(localStorage.getItem('atiempo-mobile'));}catch{saved=null;}
-  const state={reminders:Array.isArray(saved?.reminders)?saved.reminders:defaults,contacts:Array.isArray(saved?.contacts)?saved.contacts:[{name:'Laura Ríos',role:'Hija · apoyo principal',status:'Activa'}],selectedId:saved?.selectedId||1,draft:saved?.draft||{title:'Tomar medicamento de la mañana',category:'Medicamento',time:'08:00',note:'Con un vaso de agua después del desayuno',date:'Hoy',frequency:'Diaria',margin:'20',voice:true,vibrate:true},filter:'Todos',search:'',alertMuted:false,toastTimer:null};
-  const persist=()=>localStorage.setItem('atiempo-mobile',JSON.stringify({reminders:state.reminders,contacts:state.contacts,selectedId:state.selectedId,draft:state.draft}));
-  const route=()=>location.hash.replace(/^#/,'').toLowerCase()||'m01';
-  const go=id=>{location.hash=id;render();window.scrollTo(0,0)};
-  const toast=message=>{const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(state.toastTimer);state.toastTimer=setTimeout(()=>el.classList.remove('show'),3200)};
-  const btn=(label,act,kind='')=>`<button class="btn ${kind}" data-action="${act}">${label}</button>`;
-  const link=(label,dest,kind='')=>`<a class="btn ${kind}" href="#${dest}">${label}</a>`;
-  const badge=s=>`<span class="badge ${s==='Hecha'?'green':s==='Pospuesta'?'amber':s==='Sin respuesta'?'red':''}">${esc(s)}</span>`;
-  const current=()=>state.reminders.find(x=>x.id===state.selectedId)||state.reminders[0];
-  const autonomy=()=>`<div class="callout">${icon('shield')}<div><strong>Tu autonomía primero</strong>Solo tú, Elena, puedes marcar una actividad como hecha o posponerla desde este dispositivo. Laura te acompaña sin decidir por ti.</div></div>`;
-  const page=(title,content,opts={})=>`<div class="app ${opts.full?'full-alert':''}"><header class="header">${opts.back?`<a class="head-link" href="#${opts.back}" aria-label="Volver">${icon('back')}</a>`:`<span class="round-icon">${icon('clock')}</span>`}<div class="brand">A Tiempo<span class="sub">${esc(title)}</span></div><a class="round-icon" href="#m11" aria-label="Red de apoyo">${icon('people')}</a></header><main class="body ${opts.full?'alert-body':''}">${content}</main>${opts.nav===false?'':`<nav class="bottom" aria-label="Navegación inferior">${[['m01','home','Hoy'],['m02','list','Recordatorios'],['m03','plus','Crear'],['m08','bell','Alerta'],['m11','people','Apoyo']].map(([id,ic,t])=>`<a href="#${id}" class="${route()===id?'active':''}">${icon(ic)}${t}</a>`).join('')}</nav>`}</div>`;
-  const title=(k,t,d='')=>`<div class="eyebrow">${k}</div><h1>${t}</h1>${d?`<p class="subhead">${d}</p>`:''}`;
-  const spokenTime=value=>{const [hour,minute]=String(value).split(':').map(Number);return `${(hour%12)||12}:${String(minute||0).padStart(2,'0')} ${hour<12?'a. m.':'p. m.'}`;};
-  const reminderRow=r=>`<div class="reminder ${r.status==='Hecha'?'green':r.status==='Pospuesta'?'amber':''}"><span class="stripe"></span><a href="#m06" data-select="${r.id}"><strong>${esc(r.title)}</strong><p>${esc(r.note)}</p>${badge(r.status)}</a><time>${esc(r.time)}</time></div>`;
-  function m01(){const next=current();return page('Hoy',`<div class="topline"><span class="badge">${icon('calendar')} Hoy · Tu jornada</span><span class="badge green">● Todo al día</span></div>${title('Lunes, 24 de octubre','¡Buenos días, Elena!','Tienes actividades programadas para hoy.')}<section class="section"><div class="section-title"><h2>Próximo recordatorio</h2><span class="badge">En 15 minutos</span></div><div class="card" style="border-left:5px solid var(--blue)"><div class="between"><span class="badge">Pendiente</span><strong>${esc(next.time)}</strong></div><h2 style="margin:14px 0 7px">${esc(next.title)}</h2><p class="muted">${esc(next.note)}</p><div class="preview" style="margin-top:18px">${icon('bell')} Campana suave, vibración y lectura en voz alta</div><div class="action-foot">${link('Ver recordatorio','m06','primary')}${link('Ver alerta de ejemplo','m08','outline')}</div></div></section><section class="section"><div class="section-title"><h2>Mis recordatorios de hoy</h2><small>${state.reminders.length} en total</small></div><div class="card">${state.reminders.slice(1,4).map(reminderRow).join('')}</div></section><section class="section">${autonomy()}</section>`);}
-  function m02(){const q=state.search.toLocaleLowerCase('es');const list=state.reminders.filter(r=>(state.filter==='Todos'||r.status===state.filter)&&`${r.title} ${r.note}`.toLocaleLowerCase('es').includes(q));return page('Recordatorios',`${title('Tus rutinas','Mis recordatorios','Consulta tus actividades, horarios y estados con calma.')}<div class="section stack"><label class="field">Buscar<input id="search" placeholder="Buscar recordatorio" value="${esc(state.search)}"></label><div class="chip-row">${['Todos','Pendiente','Hecha','Pospuesta'].map(s=>`<button class="chip ${state.filter===s?'active':''}" data-filter="${s}">${s}</button>`).join('')}</div><div class="card">${list.length?list.map(reminderRow).join(''):'<p>No hay actividades con este filtro.</p>'}</div>${link(`${icon('plus')} Crear recordatorio`,'m03','primary full')}</div>`);}
-  const steps=(n,t)=>`<div class="steps"><div class="between"><strong>${t}</strong><span class="badge">Paso ${n} de 3</span></div><div class="progress"><i style="width:${n*33.33}%"></i></div></div>`;
-  function m03(){const d=state.draft;return page('Nuevo recordatorio',`${steps(1,'Qué y cuándo')}${title('Paso 1 de 3','¿Qué deseas recordar y a qué hora?','Completa estos datos sencillos para acompañarte a tiempo.')}<form id="step1" class="stack section"><div class="card"><label class="field">Nombre del recordatorio *<input name="title" required maxlength="60" value="${esc(d.title)}" placeholder="Ej. Tomar medicamento"><small>Usa un nombre corto y fácil de reconocer.</small></label></div><div class="card"><strong>Tipo de actividad</strong><div class="choice-grid" style="margin-top:12px">${['Medicamento','Cita','Actividad diaria','Hogar o personal'].map(c=>`<label class="choice"><input type="radio" name="category" value="${c}" ${d.category===c?'checked':''}>${c}</label>`).join('')}</div></div><div class="card"><strong>Fecha de inicio</strong><div class="date-choices" style="margin-top:12px">${['Hoy','Mañana','Otra fecha'].map(c=>`<label><input type="radio" name="date" value="${c}" ${d.date===c?'checked':''}>${c}</label>`).join('')}</div></div><div class="card"><label class="field">Hora del recordatorio<input name="time" type="time" value="${esc(d.time)}" required></label><div class="callout" style="margin-top:12px">${icon('bell')} Sonará a las ${esc(d.time)}.</div></div><button type="submit" class="btn secondary full">Continuar al paso 2 →</button></form>`,{back:'m02'});}
-  function m04(){const d=state.draft;return page('Repetición y aviso',`${steps(2,'Repetición y aviso')}${title('Paso 2 de 3','¿Cómo te gustaría recibir el aviso?','Configura la repetición y el acompañamiento que prefieras.')}<form id="step2" class="stack section"><div class="card"><strong>Frecuencia</strong><div class="choice-grid" style="margin-top:12px">${['Diaria','Días específicos','Una vez','Semanal'].map(c=>`<label class="choice"><input type="radio" name="frequency" value="${c}" ${d.frequency===c?'checked':''}>${c}</label>`).join('')}</div></div><div class="card"><strong>Tipo de aviso</strong><div class="stack" style="margin-top:12px"><label class="between"><span>${icon('volume')} Sonido suave / lectura</span><input name="voice" type="checkbox" ${d.voice?'checked':''}></label><label class="between"><span>${icon('bell')} Vibración</span><input name="vibrate" type="checkbox" ${d.vibrate?'checked':''}></label></div></div><div class="card"><label class="field">Avisar a Laura tras la espera<select name="margin">${['15','20','30','45'].map(x=>`<option value="${x}" ${d.margin===x?'selected':''}>${x} minutos sin respuesta</option>`).join('')}</select></label><p class="small" style="margin-top:10px">Sin respuesta no equivale a una emergencia médica.</p></div>${autonomy()}<div class="btn-row">${link('Atrás','m03','outline')}<button class="btn secondary" type="submit">Revisar →</button></div></form>`,{back:'m03'});}
-  function m05(){const d=state.draft;return page('Revisar y guardar',`${steps(3,'Revisar y guardar')}${title('Paso 3 de 3','Revisa tu recordatorio','Comprueba los detalles antes de guardarlo.')}<div class="stack section"><div class="card"><div class="section-title"><h2>${esc(d.title)}</h2>${icon('check')}</div>${[['Tipo de actividad',d.category],['Fecha de inicio',d.date],['Hora',d.time],['Repetición',d.frequency],['Tipo de aviso',`${d.voice?'Campana suave + lectura en voz alta':'Aviso visual'}${d.vibrate?' + vibración':''}`],['Apoyo familiar automático',`Avisar a Laura Ríos después de ${d.margin} min sin respuesta`]].map(([a,b])=>`<div class="info-pair"><span>${a}</span><strong>${esc(b)}</strong></div>`).join('')}</div>${autonomy()}<div class="btn-row">${link('Modificar datos','m03','outline')}${btn('Guardar recordatorio','save','primary')}</div></div>`,{back:'m04'});}
-  function m06(){const r=current();return page('Detalle de recordatorio',`${title('Tu actividad',esc(r.title),esc(r.note))}<div class="stack section"><div class="card"><div class="between"><span class="badge">${esc(r.category)}</span>${badge(r.status)}</div><div class="info-pair"><span>Horario</span><strong>${esc(r.time)}</strong></div><div class="info-pair"><span>Frecuencia</span><strong>${esc(r.frequency)}</strong></div><div class="info-pair"><span>Instrucción</span><strong>${esc(r.note)}</strong></div><div class="info-pair"><span>Aviso</span><strong>Campana suave y vibración</strong></div></div>${autonomy()}<div class="btn-row">${link(`${icon('edit')} Editar`,'m07','outline')}${link(`${icon('bell')} Activar aviso`,'m08','primary')}</div></div>`,{back:'m02'});}
-  function m07(){const r=current();return page('Editar recordatorio',`${title('Ajustes de tu actividad','Editar recordatorio','Puedes modificar el nombre, la hora y la instrucción.')}<form id="edit-form" class="stack section"><div class="card stack"><label class="field">Nombre *<input name="title" required maxlength="60" value="${esc(r.title)}"></label><label class="field">Hora<input name="time" type="time" value="${esc(r.time)}" required></label><label class="field">Instrucción<textarea name="note" maxlength="250">${esc(r.note)}</textarea></label><label class="field">Frecuencia<select name="frequency">${['Diaria','Días específicos','Una vez','Semanal'].map(x=>`<option ${r.frequency===x?'selected':''}>${x}</option>`).join('')}</select></label></div><div class="btn-row">${btn('Cancelar','discard','outline')}<button class="btn primary" type="submit">Guardar cambios</button></div></form>`,{back:'m06'});}
-  function m08(){const r=current();return page('Alerta activa',`<div class="alert-head center"><span class="badge">${icon('clock')} ${spokenTime(r.time)}</span><div class="alarm-circle">${icon('bell')}</div><h1>¡Es hora de ${r.category==='Medicamento'?'tomar tu medicamento':'tu actividad'}!</h1></div><div class="card"><div class="row"><span class="photo-placeholder">${icon(r.category==='Medicamento'?'bell':'calendar')}</span><div><span class="badge">Recordatorio</span><h2 style="margin-top:8px">${esc(r.title)}</h2></div></div><div class="callout" style="margin-top:18px">${icon('info')} ${esc(r.note)}</div><button class="btn full" data-action="voice" style="margin-top:14px">${icon('volume')} ${state.alertMuted?'Reanudar lectura':'Pausar lectura'}</button></div><div style="flex:1"></div><div class="stack" style="margin-top:35px">${btn(`${icon('volume')} ${state.alertMuted?'Activar':'Silenciar'} alarma`,'mute','outline full')}<div class="callout">${icon('info')} Tranquila, Elena. Tu aviso permanecerá hasta que elijas una opción. Laura solo recibirá un aviso tras ${esc(state.draft.margin)} minutos sin respuesta.</div><div class="btn-row">${btn(`${icon('clock')} Posponer`,'postpone','outline')}${btn(`${icon('check')} Ya lo hice`,'done','green')}</div></div>`,{back:'m06',nav:false,full:true});}
-  function m09(){return page('Confirmación',`<div class="center"><div class="success-mark">${icon('check')}</div>${title('Confirmado por ti','¡Muy bien, Elena!','Marcaste esta actividad como hecha desde tu dispositivo.')}<div class="card success" style="margin-top:28px"><h2>${esc(current().title)}</h2><p class="subhead">Estado: Hecha por Elena.</p></div><p class="subhead" style="margin:26px 0">Tu decisión quedó registrada en esta demostración. Laura puede verla, pero no cambiarla.</p></div><div class="action-foot">${link('Volver a Hoy','m01','primary full')}${link('Ver mis recordatorios','m02','outline full')}</div>`,{nav:false});}
-  function m10(){return page('Confirmación',`<div class="center"><div class="snooze-mark">${icon('clock')}</div>${title('A tu ritmo','Recordatorio pospuesto','Elegiste continuar en unos minutos.')}<div class="card" style="margin-top:28px"><h2>${esc(current().title)}</h2><div class="info-pair"><span>Nueva hora</span><strong id="new-time">${esc(current().time)}</strong></div>${badge('Pospuesta')}</div><p class="subhead" style="margin:26px 0">La actividad sigue pendiente hasta que decidas completarla.</p></div><div class="action-foot">${link('Volver a Hoy','m01','primary full')}${link('Ver mis recordatorios','m02','outline full')}</div>`,{nav:false});}
-  function m11(){return page('Apoyo',`${title('Tu red de confianza','Personas de apoyo','Tú decides quién puede acompañarte y qué puede ver.')}<div class="stack section"><div class="card"><div class="section-title"><h2>Tu red de apoyo</h2><span class="badge green">Conectada</span></div>${state.contacts.map(c=>`<div class="row" style="padding:12px 0;border-bottom:1px solid var(--line)"><span class="avatar">${esc(c.name[0])}</span><div style="flex:1"><strong>${esc(c.name)}</strong><p class="small">${esc(c.role)}</p></div><span class="badge ${c.status==='Activa'?'green':''}">${esc(c.status)}</span></div>`).join('')}</div>${autonomy()}<div class="card"><h2>Permisos de acompañamiento</h2><div class="info-pair"><span>Ver tus estados</span><strong>Permitido</strong></div><div class="info-pair"><span>Sugerir recordatorios</span><strong>Permitido</strong></div><div class="info-pair"><span>Confirmar por ti</span><strong>No permitido</strong></div></div>${link(`${icon('plus')} Agregar persona de apoyo`,'m12','primary full')}${link('Ver sistema visual','design','outline full')}</div>`);}
-  function m12(){return page('Agregar apoyo',`${title('Invitación privada','Agregar persona de apoyo','Elige a alguien de confianza para acompañarte.')}<form id="support-form" class="stack section"><div class="card stack"><label class="field">Nombre de la persona *<input name="name" required maxlength="60" placeholder="Ej. Laura Ríos"></label><label class="field">Relación contigo<select name="role"><option>Familiar</option><option>Amistad</option><option>Persona cuidadora</option><option>Otra persona</option></select></label><label class="field">Medio de contacto (demostración)<input name="contact" placeholder="Correo o teléfono, no se enviará" maxlength="80"></label></div><div class="card"><h2>Permisos sugeridos</h2><label class="between" style="margin-top:14px">Ver actividades y estados <input type="checkbox" checked></label><label class="between" style="margin-top:14px">Proponer recordatorios <input type="checkbox" checked></label><label class="between" style="margin-top:14px">Recibir alertas prudentes <input type="checkbox" checked></label></div>${autonomy()}<button class="btn primary full" type="submit">Revisar invitación →</button></form>`,{back:'m11'});}
-  function m13(){const c=state.pendingContact||{name:'Nueva persona',role:'Familiar',contact:'No especificado'};return page('Revisar invitación',`${title('Antes de continuar','Revisa la invitación','Verifica a quién darás acceso y cuáles son sus límites.')}<div class="stack section"><div class="card"><div class="row"><span class="avatar big">${esc(c.name[0])}</span><div><h2>${esc(c.name)}</h2><p class="small">${esc(c.role)}</p></div></div><div class="info-pair"><span>Contacto</span><strong>${esc(c.contact||'No especificado')}</strong></div><div class="info-pair"><span>Ver estados</span><strong>Sí</strong></div><div class="info-pair"><span>Proponer recordatorios</span><strong>Sí</strong></div><div class="info-pair"><span>Confirmar por Elena</span><strong>No</strong></div></div>${autonomy()}<div class="callout red">${icon('info')} Este prototipo no envía invitaciones reales ni comparte tus datos.</div><div class="btn-row">${link('Modificar','m12','outline')}${btn('Guardar invitación','invite','primary')}</div></div>`,{back:'m12'});}
-  function m14(){const c=state.contacts.at(-1);return page('Estado de invitación',`${title('Seguimiento','Invitación registrada','Consulta el estado de tu red de apoyo.')}<div class="stack section"><div class="card"><div class="row"><span class="avatar big">${esc(c.name[0])}</span><div><h2>${esc(c.name)}</h2><p class="small">${esc(c.role)}</p></div></div><div class="info-pair"><span>Estado</span><strong>Pendiente · demostración</strong></div><div class="info-pair"><span>Autonomía</span><strong>Elena conserva el control</strong></div></div><div class="callout green">${icon('check')} La invitación quedó guardada solo en esta app. No se envió ningún mensaje.</div>${link('Volver a mi red de apoyo','m11','primary full')}</div>`,{back:'m11'});}
-  function design(){return page('Sistema visual',`${title('A Tiempo Mobile','UI kit personalizado','Paleta, componentes y estados accesibles del prototipo.')}<div class="stack section"><div class="card"><h2>Paleta</h2><div class="swatches" style="margin-top:15px">${[['#0b3b66','Primario'],['#155a91','Acción'],['#2e7d32','Hecha'],['#b26a00','Pospuesta'],['#b3261e','Alerta'],['#f7f9ff','Superficie']].map(([c,t])=>`<div class="swatch"><i style="background:${c}"></i><small>${t} · ${c}</small></div>`).join('')}</div></div><div class="card"><h2>Componentes reales</h2><div class="stack" style="margin-top:14px">${btn('Acción primaria','demo','primary')}${btn('Acción secundaria','demo','outline')}${badge('Hecha')} ${badge('Pospuesta')} ${badge('Pendiente')}</div></div>${autonomy()}<div class="card"><h2>Legibilidad</h2><p class="subhead">Jerarquía clara, zonas táctiles de al menos 48 px, espaciado basado en 8 px y estados identificados por texto, forma y color.</p></div></div>`,{back:'m11'});}
-  const screens={m01,m02,m03,m04,m05,m06,m07,m08,m09,m10,m11,m12,m13,m14,design};
-  function render(){const r=route();$('#app').innerHTML=(screens[r]||m01)();document.title=`A Tiempo · ${r.toUpperCase()}`;}
-  function modal(t,b,confirm){const el=document.createElement('div');el.className='modal-bg';el.innerHTML=`<div class="modal" role="dialog" aria-modal="true"><h2>${esc(t)}</h2><p>${esc(b)}</p><div class="btn-row">${btn('Seguir editando','close','outline')}${btn('Descartar','confirm-discard','primary')}</div></div>`;document.body.append(el);state.modalConfirm=confirm;}
-  document.addEventListener('click',e=>{const select=e.target.closest('[data-select]');if(select){state.selectedId=Number(select.dataset.select);persist();}const f=e.target.closest('[data-filter]');if(f){state.filter=f.dataset.filter;render();return;}const b=e.target.closest('[data-action]');if(!b)return;switch(b.dataset.action){
-    case 'save':{const d=state.draft;const id=Date.now();state.reminders.unshift({...d,id,status:'Pendiente'});state.selectedId=id;persist();toast('Recordatorio guardado en esta demostración.');go('m06');break;}
-    case 'done':current().status='Hecha';persist();go('m09');break;
-    case 'postpone':{const r=current();r.status='Pospuesta';const [h,m]=r.time.split(':').map(Number);const next=(h*60+m+20)%(24*60);r.time=`${String(Math.floor(next/60)).padStart(2,'0')}:${String(next%60).padStart(2,'0')}`;persist();go('m10');break;}
-    case 'mute':case 'voice':state.alertMuted=!state.alertMuted;render();toast(state.alertMuted?'Aviso silenciado en la demostración.':'Aviso activado.');break;
-    case 'discard':modal('¿Descartar cambios?','Los cambios no guardados se perderán.',()=>go('m06'));break;
-    case 'close':document.querySelector('.modal-bg')?.remove();break;
-    case 'confirm-discard':document.querySelector('.modal-bg')?.remove();state.modalConfirm?.();break;
-    case 'invite':{const c=state.pendingContact;if(!c){toast('Primero agrega una persona de apoyo.');go('m12');return;}state.contacts.push({...c,status:'Pendiente'});persist();go('m14');break;}
-    case 'demo':toast('Componente activo del UI kit.');break;
-  }});
-  document.addEventListener('input',e=>{if(e.target.id==='search'){state.search=e.target.value;const pos=e.target.selectionStart;render();$('#search')?.focus();$('#search')?.setSelectionRange(pos,pos);}});
-  document.addEventListener('submit',e=>{const id=e.target.id;if(!['step1','step2','edit-form','support-form'].includes(id))return;e.preventDefault();const f=e.target;if(!f.reportValidity())return;const d=new FormData(f);if(id==='step1'){Object.assign(state.draft,{title:String(d.get('title')).trim(),category:String(d.get('category')||'Medicamento'),date:String(d.get('date')||'Hoy'),time:String(d.get('time'))});persist();go('m04');}if(id==='step2'){Object.assign(state.draft,{frequency:String(d.get('frequency')||'Diaria'),margin:String(d.get('margin')),voice:!!d.get('voice'),vibrate:!!d.get('vibrate')});persist();go('m05');}if(id==='edit-form'){Object.assign(current(),{title:String(d.get('title')).trim(),time:String(d.get('time')),note:String(d.get('note')).trim(),frequency:String(d.get('frequency'))});persist();toast('Cambios guardados localmente.');go('m06');}if(id==='support-form'){state.pendingContact={name:String(d.get('name')).trim(),role:String(d.get('role')),contact:String(d.get('contact')).trim()};go('m13');}});
-  window.addEventListener('hashchange',render);document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelector('.modal-bg')?.remove()});render();
+  let saved;
+  try {
+    saved = JSON.parse(localStorage.getItem('atiempo-mobile'));
+  } catch {
+    saved = null;
+  }
+  const state = {
+    reminders: Array.isArray(saved?.reminders) ? saved.reminders : defaults,
+    contacts: Array.isArray(saved?.contacts)
+      ? saved.contacts
+      : [{ name: 'Laura Ríos', role: 'Hija · apoyo principal', status: 'Activa' }],
+    selectedId: saved?.selectedId || 1,
+    draft: saved?.draft || {
+      title: 'Tomar medicamento de la mañana',
+      category: 'Medicamento',
+      time: '08:00',
+      note: 'Con un vaso de agua después del desayuno',
+      date: 'Hoy',
+      frequency: 'Diaria',
+      margin: '20',
+      voice: true,
+      vibrate: true,
+    },
+    filter: 'Todos',
+    search: '',
+    alertMuted: false,
+    toastTimer: null,
+  };
+  const persist = () =>
+    localStorage.setItem(
+      'atiempo-mobile',
+      JSON.stringify({
+        reminders: state.reminders,
+        contacts: state.contacts,
+        selectedId: state.selectedId,
+        draft: state.draft,
+      }),
+    );
+  const route = () => location.hash.replace(/^#/, '').toLowerCase() || 'm01';
+  const go = (id) => {
+    location.hash = id;
+    render();
+    window.scrollTo(0, 0);
+  };
+  const toast = (message) => {
+    const el = $('#toast');
+    el.textContent = message;
+    el.classList.add('show');
+    clearTimeout(state.toastTimer);
+    state.toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+  };
+  const btn = (label, act, kind = '') =>
+    `<button class="btn ${kind}" data-action="${act}">${label}</button>`;
+  const link = (label, dest, kind = '') =>
+    `<a class="btn ${kind}" href="#${dest}">${label}</a>`;
+  const badge = (s) =>
+    `<span class="badge ${s === 'Hecha' ? 'green' : s === 'Pospuesta' ? 'amber' : s === 'Sin respuesta' ? 'red' : ''}">${esc(s)}</span>`;
+  const current = () =>
+    state.reminders.find((x) => x.id === state.selectedId) || state.reminders[0];
+  const autonomy = () =>
+    `<div class="callout">${icon('shield')}<div><strong>Tu autonomía primero</strong>Solo tú, Elena, puedes marcar una actividad como hecha o posponerla desde este dispositivo. Laura te acompaña sin decidir por ti.</div></div>`;
+  const page = (title, content, opts = {}) =>
+    `<div class="app ${opts.full ? 'full-alert' : ''}"><header class="header">${opts.back ? `<a class="head-link" href="#${opts.back}" aria-label="Volver">${icon('back')}</a>` : `<span class="round-icon">${icon('clock')}</span>`}<div class="brand">A Tiempo<span class="sub">${esc(title)}</span></div><a class="round-icon" href="#m11" aria-label="Red de apoyo">${icon('people')}</a></header><main class="body ${opts.full ? 'alert-body' : ''}">${content}</main>${
+      opts.nav === false
+        ? ''
+        : `<nav class="bottom" aria-label="Navegación inferior">${[
+            ['m01', 'home', 'Hoy'],
+            ['m02', 'list', 'Recordatorios'],
+            ['m03', 'plus', 'Crear'],
+            ['m08', 'bell', 'Alerta'],
+            ['m11', 'people', 'Apoyo'],
+          ]
+            .map(
+              ([id, ic, t]) =>
+                `<a href="#${id}" class="${route() === id ? 'active' : ''}">${icon(ic)}${t}</a>`,
+            )
+            .join('')}</nav>`
+    }</div>`;
+  const title = (k, t, d = '') =>
+    `<div class="eyebrow">${k}</div><h1>${t}</h1>${d ? `<p class="subhead">${d}</p>` : ''}`;
+  const spokenTime = (value) => {
+    const [hour, minute] = String(value).split(':').map(Number);
+    return `${hour % 12 || 12}:${String(minute || 0).padStart(2, '0')} ${hour < 12 ? 'a. m.' : 'p. m.'}`;
+  };
+  const reminderRow = (r) =>
+    `<div class="reminder ${r.status === 'Hecha' ? 'green' : r.status === 'Pospuesta' ? 'amber' : ''}"><span class="stripe"></span><a href="#m06" data-select="${r.id}"><strong>${esc(r.title)}</strong><p>${esc(r.note)}</p>${badge(r.status)}</a><time>${esc(r.time)}</time></div>`;
+  function m01() {
+    const next = current();
+    return page(
+      'Hoy',
+      `<div class="topline"><span class="badge">${icon('calendar')} Hoy · Tu jornada</span><span class="badge green">● Todo al día</span></div>${title('Lunes, 24 de octubre', '¡Buenos días, Elena!', 'Tienes actividades programadas para hoy.')}<section class="section"><div class="section-title"><h2>Próximo recordatorio</h2><span class="badge">En 15 minutos</span></div><div class="card" style="border-left:5px solid var(--blue)"><div class="between"><span class="badge">Pendiente</span><strong>${esc(next.time)}</strong></div><h2 style="margin:14px 0 7px">${esc(next.title)}</h2><p class="muted">${esc(next.note)}</p><div class="preview" style="margin-top:18px">${icon('bell')} Campana suave, vibración y lectura en voz alta</div><div class="action-foot">${link('Ver recordatorio', 'm06', 'primary')}${link('Ver alerta de ejemplo', 'm08', 'outline')}</div></div></section><section class="section"><div class="section-title"><h2>Mis recordatorios de hoy</h2><small>${state.reminders.length} en total</small></div><div class="card">${state.reminders.slice(1, 4).map(reminderRow).join('')}</div></section><section class="section">${autonomy()}</section>`,
+    );
+  }
+  function m02() {
+    const q = state.search.toLocaleLowerCase('es');
+    const list = state.reminders.filter(
+      (r) =>
+        (state.filter === 'Todos' || r.status === state.filter) &&
+        `${r.title} ${r.note}`.toLocaleLowerCase('es').includes(q),
+    );
+    return page(
+      'Recordatorios',
+      `${title('Tus rutinas', 'Mis recordatorios', 'Consulta tus actividades, horarios y estados con calma.')}<div class="section stack"><label class="field">Buscar<input id="search" placeholder="Buscar recordatorio" value="${esc(state.search)}"></label><div class="chip-row">${['Todos', 'Pendiente', 'Hecha', 'Pospuesta'].map((s) => `<button class="chip ${state.filter === s ? 'active' : ''}" data-filter="${s}">${s}</button>`).join('')}</div><div class="card">${list.length ? list.map(reminderRow).join('') : '<p>No hay actividades con este filtro.</p>'}</div>${link(`${icon('plus')} Crear recordatorio`, 'm03', 'primary full')}</div>`,
+    );
+  }
+  const steps = (n, t) =>
+    `<div class="steps"><div class="between"><strong>${t}</strong><span class="badge">Paso ${n} de 3</span></div><div class="progress"><i style="width:${n * 33.33}%"></i></div></div>`;
+  function m03() {
+    const d = state.draft;
+    return page(
+      'Nuevo recordatorio',
+      `${steps(1, 'Qué y cuándo')}${title('Paso 1 de 3', '¿Qué deseas recordar y a qué hora?', 'Completa estos datos sencillos para acompañarte a tiempo.')}<form id="step1" class="stack section"><div class="card"><label class="field">Nombre del recordatorio *<input name="title" required maxlength="60" value="${esc(d.title)}" placeholder="Ej. Tomar medicamento"><small>Usa un nombre corto y fácil de reconocer.</small></label></div><div class="card"><strong>Tipo de actividad</strong><div class="choice-grid" style="margin-top:12px">${['Medicamento', 'Cita', 'Actividad diaria', 'Hogar o personal'].map((c) => `<label class="choice"><input type="radio" name="category" value="${c}" ${d.category === c ? 'checked' : ''}>${c}</label>`).join('')}</div></div><div class="card"><strong>Fecha de inicio</strong><div class="date-choices" style="margin-top:12px">${['Hoy', 'Mañana', 'Otra fecha'].map((c) => `<label><input type="radio" name="date" value="${c}" ${d.date === c ? 'checked' : ''}>${c}</label>`).join('')}</div></div><div class="card"><label class="field">Hora del recordatorio<input name="time" type="time" value="${esc(d.time)}" required></label><div class="callout" style="margin-top:12px">${icon('bell')} Sonará a las ${esc(d.time)}.</div></div><button type="submit" class="btn secondary full">Continuar al paso 2 →</button></form>`,
+      { back: 'm02' },
+    );
+  }
+  function m04() {
+    const d = state.draft;
+    return page(
+      'Repetición y aviso',
+      `${steps(2, 'Repetición y aviso')}${title('Paso 2 de 3', '¿Cómo te gustaría recibir el aviso?', 'Configura la repetición y el acompañamiento que prefieras.')}<form id="step2" class="stack section"><div class="card"><strong>Frecuencia</strong><div class="choice-grid" style="margin-top:12px">${['Diaria', 'Días específicos', 'Una vez', 'Semanal'].map((c) => `<label class="choice"><input type="radio" name="frequency" value="${c}" ${d.frequency === c ? 'checked' : ''}>${c}</label>`).join('')}</div></div><div class="card"><strong>Tipo de aviso</strong><div class="stack" style="margin-top:12px"><label class="between"><span>${icon('volume')} Sonido suave / lectura</span><input name="voice" type="checkbox" ${d.voice ? 'checked' : ''}></label><label class="between"><span>${icon('bell')} Vibración</span><input name="vibrate" type="checkbox" ${d.vibrate ? 'checked' : ''}></label></div></div><div class="card"><label class="field">Avisar a Laura tras la espera<select name="margin">${['15', '20', '30', '45'].map((x) => `<option value="${x}" ${d.margin === x ? 'selected' : ''}>${x} minutos sin respuesta</option>`).join('')}</select></label><p class="small" style="margin-top:10px">Sin respuesta no equivale a una emergencia médica.</p></div>${autonomy()}<div class="btn-row">${link('Atrás', 'm03', 'outline')}<button class="btn secondary" type="submit">Revisar →</button></div></form>`,
+      { back: 'm03' },
+    );
+  }
+  function m05() {
+    const d = state.draft;
+    return page(
+      'Revisar y guardar',
+      `${steps(3, 'Revisar y guardar')}${title('Paso 3 de 3', 'Revisa tu recordatorio', 'Comprueba los detalles antes de guardarlo.')}<div class="stack section"><div class="card"><div class="section-title"><h2>${esc(d.title)}</h2>${icon('check')}</div>${[
+        ['Tipo de actividad', d.category],
+        ['Fecha de inicio', d.date],
+        ['Hora', d.time],
+        ['Repetición', d.frequency],
+        [
+          'Tipo de aviso',
+          `${d.voice ? 'Campana suave + lectura en voz alta' : 'Aviso visual'}${d.vibrate ? ' + vibración' : ''}`,
+        ],
+        [
+          'Apoyo familiar automático',
+          `Avisar a Laura Ríos después de ${d.margin} min sin respuesta`,
+        ],
+      ]
+        .map(
+          ([a, b]) =>
+            `<div class="info-pair"><span>${a}</span><strong>${esc(b)}</strong></div>`,
+        )
+        .join(
+          '',
+        )}</div>${autonomy()}<div class="btn-row">${link('Modificar datos', 'm03', 'outline')}${btn('Guardar recordatorio', 'save', 'primary')}</div></div>`,
+      { back: 'm04' },
+    );
+  }
+  function m06() {
+    const r = current();
+    return page(
+      'Detalle de recordatorio',
+      `${title('Tu actividad', esc(r.title), esc(r.note))}<div class="stack section"><div class="card"><div class="between"><span class="badge">${esc(r.category)}</span>${badge(r.status)}</div><div class="info-pair"><span>Horario</span><strong>${esc(r.time)}</strong></div><div class="info-pair"><span>Frecuencia</span><strong>${esc(r.frequency)}</strong></div><div class="info-pair"><span>Instrucción</span><strong>${esc(r.note)}</strong></div><div class="info-pair"><span>Aviso</span><strong>Campana suave y vibración</strong></div></div>${autonomy()}<div class="btn-row">${link(`${icon('edit')} Editar`, 'm07', 'outline')}${link(`${icon('bell')} Activar aviso`, 'm08', 'primary')}</div></div>`,
+      { back: 'm02' },
+    );
+  }
+  function m07() {
+    const r = current();
+    return page(
+      'Editar recordatorio',
+      `${title('Ajustes de tu actividad', 'Editar recordatorio', 'Puedes modificar el nombre, la hora y la instrucción.')}<form id="edit-form" class="stack section"><div class="card stack"><label class="field">Nombre *<input name="title" required maxlength="60" value="${esc(r.title)}"></label><label class="field">Hora<input name="time" type="time" value="${esc(r.time)}" required></label><label class="field">Instrucción<textarea name="note" maxlength="250">${esc(r.note)}</textarea></label><label class="field">Frecuencia<select name="frequency">${['Diaria', 'Días específicos', 'Una vez', 'Semanal'].map((x) => `<option ${r.frequency === x ? 'selected' : ''}>${x}</option>`).join('')}</select></label></div><div class="btn-row">${btn('Cancelar', 'discard', 'outline')}<button class="btn primary" type="submit">Guardar cambios</button></div></form>`,
+      { back: 'm06' },
+    );
+  }
+  function m08() {
+    const r = current();
+    return page(
+      'Alerta activa',
+      `<div class="alert-head center"><span class="badge">${icon('clock')} ${spokenTime(r.time)}</span><div class="alarm-circle">${icon('bell')}</div><h1>¡Es hora de ${r.category === 'Medicamento' ? 'tomar tu medicamento' : 'tu actividad'}!</h1></div><div class="card"><div class="row"><span class="photo-placeholder">${icon(r.category === 'Medicamento' ? 'bell' : 'calendar')}</span><div><span class="badge">Recordatorio</span><h2 style="margin-top:8px">${esc(r.title)}</h2></div></div><div class="callout" style="margin-top:18px">${icon('info')} ${esc(r.note)}</div><button class="btn full" data-action="voice" style="margin-top:14px">${icon('volume')} ${state.alertMuted ? 'Reanudar lectura' : 'Pausar lectura'}</button></div><div style="flex:1"></div><div class="stack" style="margin-top:35px">${btn(`${icon('volume')} ${state.alertMuted ? 'Activar' : 'Silenciar'} alarma`, 'mute', 'outline full')}<div class="callout">${icon('info')} Tranquila, Elena. Tu aviso permanecerá hasta que elijas una opción. Laura solo recibirá un aviso tras ${esc(state.draft.margin)} minutos sin respuesta.</div><div class="btn-row">${btn(`${icon('clock')} Posponer`, 'postpone', 'outline')}${btn(`${icon('check')} Ya lo hice`, 'done', 'green')}</div></div>`,
+      { back: 'm06', nav: false, full: true },
+    );
+  }
+  function m09() {
+    return page(
+      'Confirmación',
+      `<div class="center"><div class="success-mark">${icon('check')}</div>${title('Confirmado por ti', '¡Muy bien, Elena!', 'Marcaste esta actividad como hecha desde tu dispositivo.')}<div class="card success" style="margin-top:28px"><h2>${esc(current().title)}</h2><p class="subhead">Estado: Hecha por Elena.</p></div><p class="subhead" style="margin:26px 0">Tu decisión quedó registrada en esta demostración. Laura puede verla, pero no cambiarla.</p></div><div class="action-foot">${link('Volver a Hoy', 'm01', 'primary full')}${link('Ver mis recordatorios', 'm02', 'outline full')}</div>`,
+      { nav: false },
+    );
+  }
+  function m10() {
+    return page(
+      'Confirmación',
+      `<div class="center"><div class="snooze-mark">${icon('clock')}</div>${title('A tu ritmo', 'Recordatorio pospuesto', 'Elegiste continuar en unos minutos.')}<div class="card" style="margin-top:28px"><h2>${esc(current().title)}</h2><div class="info-pair"><span>Nueva hora</span><strong id="new-time">${esc(current().time)}</strong></div>${badge('Pospuesta')}</div><p class="subhead" style="margin:26px 0">La actividad sigue pendiente hasta que decidas completarla.</p></div><div class="action-foot">${link('Volver a Hoy', 'm01', 'primary full')}${link('Ver mis recordatorios', 'm02', 'outline full')}</div>`,
+      { nav: false },
+    );
+  }
+  function m11() {
+    return page(
+      'Apoyo',
+      `${title('Tu red de confianza', 'Personas de apoyo', 'Tú decides quién puede acompañarte y qué puede ver.')}<div class="stack section"><div class="card"><div class="section-title"><h2>Tu red de apoyo</h2><span class="badge green">Conectada</span></div>${state.contacts.map((c) => `<div class="row" style="padding:12px 0;border-bottom:1px solid var(--line)"><span class="avatar">${esc(c.name[0])}</span><div style="flex:1"><strong>${esc(c.name)}</strong><p class="small">${esc(c.role)}</p></div><span class="badge ${c.status === 'Activa' ? 'green' : ''}">${esc(c.status)}</span></div>`).join('')}</div>${autonomy()}<div class="card"><h2>Permisos de acompañamiento</h2><div class="info-pair"><span>Ver tus estados</span><strong>Permitido</strong></div><div class="info-pair"><span>Sugerir recordatorios</span><strong>Permitido</strong></div><div class="info-pair"><span>Confirmar por ti</span><strong>No permitido</strong></div></div>${link(`${icon('plus')} Agregar persona de apoyo`, 'm12', 'primary full')}${link('Ver sistema visual', 'design', 'outline full')}</div>`,
+    );
+  }
+  function m12() {
+    return page(
+      'Agregar apoyo',
+      `${title('Invitación privada', 'Agregar persona de apoyo', 'Elige a alguien de confianza para acompañarte.')}<form id="support-form" class="stack section"><div class="card stack"><label class="field">Nombre de la persona *<input name="name" required maxlength="60" placeholder="Ej. Laura Ríos"></label><label class="field">Relación contigo<select name="role"><option>Familiar</option><option>Amistad</option><option>Persona cuidadora</option><option>Otra persona</option></select></label><label class="field">Medio de contacto (demostración)<input name="contact" placeholder="Correo o teléfono, no se enviará" maxlength="80"></label></div><div class="card"><h2>Permisos sugeridos</h2><label class="between" style="margin-top:14px">Ver actividades y estados <input type="checkbox" checked></label><label class="between" style="margin-top:14px">Proponer recordatorios <input type="checkbox" checked></label><label class="between" style="margin-top:14px">Recibir alertas prudentes <input type="checkbox" checked></label></div>${autonomy()}<button class="btn primary full" type="submit">Revisar invitación →</button></form>`,
+      { back: 'm11' },
+    );
+  }
+  function m13() {
+    const c = state.pendingContact || {
+      name: 'Nueva persona',
+      role: 'Familiar',
+      contact: 'No especificado',
+    };
+    return page(
+      'Revisar invitación',
+      `${title('Antes de continuar', 'Revisa la invitación', 'Verifica a quién darás acceso y cuáles son sus límites.')}<div class="stack section"><div class="card"><div class="row"><span class="avatar big">${esc(c.name[0])}</span><div><h2>${esc(c.name)}</h2><p class="small">${esc(c.role)}</p></div></div><div class="info-pair"><span>Contacto</span><strong>${esc(c.contact || 'No especificado')}</strong></div><div class="info-pair"><span>Ver estados</span><strong>Sí</strong></div><div class="info-pair"><span>Proponer recordatorios</span><strong>Sí</strong></div><div class="info-pair"><span>Confirmar por Elena</span><strong>No</strong></div></div>${autonomy()}<div class="callout red">${icon('info')} Este prototipo no envía invitaciones reales ni comparte tus datos.</div><div class="btn-row">${link('Modificar', 'm12', 'outline')}${btn('Guardar invitación', 'invite', 'primary')}</div></div>`,
+      { back: 'm12' },
+    );
+  }
+  function m14() {
+    const c = state.contacts.at(-1);
+    return page(
+      'Estado de invitación',
+      `${title('Seguimiento', 'Invitación registrada', 'Consulta el estado de tu red de apoyo.')}<div class="stack section"><div class="card"><div class="row"><span class="avatar big">${esc(c.name[0])}</span><div><h2>${esc(c.name)}</h2><p class="small">${esc(c.role)}</p></div></div><div class="info-pair"><span>Estado</span><strong>Pendiente · demostración</strong></div><div class="info-pair"><span>Autonomía</span><strong>Elena conserva el control</strong></div></div><div class="callout green">${icon('check')} La invitación quedó guardada solo en esta app. No se envió ningún mensaje.</div>${link('Volver a mi red de apoyo', 'm11', 'primary full')}</div>`,
+      { back: 'm11' },
+    );
+  }
+  function design() {
+    return page(
+      'Sistema visual',
+      `${title('A Tiempo Mobile', 'UI kit personalizado', 'Paleta, componentes y estados accesibles del prototipo.')}<div class="stack section"><div class="card"><h2>Paleta</h2><div class="swatches" style="margin-top:15px">${[
+        ['#0b3b66', 'Primario'],
+        ['#155a91', 'Acción'],
+        ['#2e7d32', 'Hecha'],
+        ['#b26a00', 'Pospuesta'],
+        ['#b3261e', 'Alerta'],
+        ['#f7f9ff', 'Superficie'],
+      ]
+        .map(
+          ([c, t]) =>
+            `<div class="swatch"><i style="background:${c}"></i><small>${t} · ${c}</small></div>`,
+        )
+        .join(
+          '',
+        )}</div></div><div class="card"><h2>Componentes reales</h2><div class="stack" style="margin-top:14px">${btn('Acción primaria', 'demo', 'primary')}${btn('Acción secundaria', 'demo', 'outline')}${badge('Hecha')} ${badge('Pospuesta')} ${badge('Pendiente')}</div></div>${autonomy()}<div class="card"><h2>Legibilidad</h2><p class="subhead">Jerarquía clara, zonas táctiles de al menos 48 px, espaciado basado en 8 px y estados identificados por texto, forma y color.</p></div></div>`,
+      { back: 'm11' },
+    );
+  }
+  const screens = {
+    m01,
+    m02,
+    m03,
+    m04,
+    m05,
+    m06,
+    m07,
+    m08,
+    m09,
+    m10,
+    m11,
+    m12,
+    m13,
+    m14,
+    design,
+  };
+  function render() {
+    const r = route();
+    $('#app').innerHTML = (screens[r] || m01)();
+    document.title = `A Tiempo · ${r.toUpperCase()}`;
+  }
+  function modal(t, b, confirm) {
+    const el = document.createElement('div');
+    el.className = 'modal-bg';
+    el.innerHTML = `<div class="modal" role="dialog" aria-modal="true"><h2>${esc(t)}</h2><p>${esc(b)}</p><div class="btn-row">${btn('Seguir editando', 'close', 'outline')}${btn('Descartar', 'confirm-discard', 'primary')}</div></div>`;
+    document.body.append(el);
+    state.modalConfirm = confirm;
+  }
+  document.addEventListener('click', (e) => {
+    const select = e.target.closest('[data-select]');
+    if (select) {
+      state.selectedId = Number(select.dataset.select);
+      persist();
+    }
+    const f = e.target.closest('[data-filter]');
+    if (f) {
+      state.filter = f.dataset.filter;
+      render();
+      return;
+    }
+    const b = e.target.closest('[data-action]');
+    if (!b) return;
+    switch (b.dataset.action) {
+      case 'save': {
+        const d = state.draft;
+        const id = Date.now();
+        state.reminders.unshift({ ...d, id, status: 'Pendiente' });
+        state.selectedId = id;
+        persist();
+        toast('Recordatorio guardado en esta demostración.');
+        go('m06');
+        break;
+      }
+      case 'done':
+        current().status = 'Hecha';
+        persist();
+        go('m09');
+        break;
+      case 'postpone': {
+        const r = current();
+        r.status = 'Pospuesta';
+        const [h, m] = r.time.split(':').map(Number);
+        const next = (h * 60 + m + 20) % (24 * 60);
+        r.time = `${String(Math.floor(next / 60)).padStart(2, '0')}:${String(next % 60).padStart(2, '0')}`;
+        persist();
+        go('m10');
+        break;
+      }
+      case 'mute':
+      case 'voice':
+        state.alertMuted = !state.alertMuted;
+        render();
+        toast(
+          state.alertMuted ? 'Aviso silenciado en la demostración.' : 'Aviso activado.',
+        );
+        break;
+      case 'discard':
+        modal('¿Descartar cambios?', 'Los cambios no guardados se perderán.', () =>
+          go('m06'),
+        );
+        break;
+      case 'close':
+        document.querySelector('.modal-bg')?.remove();
+        break;
+      case 'confirm-discard':
+        document.querySelector('.modal-bg')?.remove();
+        state.modalConfirm?.();
+        break;
+      case 'invite': {
+        const c = state.pendingContact;
+        if (!c) {
+          toast('Primero agrega una persona de apoyo.');
+          go('m12');
+          return;
+        }
+        state.contacts.push({ ...c, status: 'Pendiente' });
+        persist();
+        go('m14');
+        break;
+      }
+      case 'demo':
+        toast('Componente activo del UI kit.');
+        break;
+    }
+  });
+  document.addEventListener('input', (e) => {
+    if (e.target.id === 'search') {
+      state.search = e.target.value;
+      const pos = e.target.selectionStart;
+      render();
+      $('#search')?.focus();
+      $('#search')?.setSelectionRange(pos, pos);
+    }
+  });
+  document.addEventListener('submit', (e) => {
+    const id = e.target.id;
+    if (!['step1', 'step2', 'edit-form', 'support-form'].includes(id)) return;
+    e.preventDefault();
+    const f = e.target;
+    if (!f.reportValidity()) return;
+    const d = new FormData(f);
+    if (id === 'step1') {
+      Object.assign(state.draft, {
+        title: String(d.get('title')).trim(),
+        category: String(d.get('category') || 'Medicamento'),
+        date: String(d.get('date') || 'Hoy'),
+        time: String(d.get('time')),
+      });
+      persist();
+      go('m04');
+    }
+    if (id === 'step2') {
+      Object.assign(state.draft, {
+        frequency: String(d.get('frequency') || 'Diaria'),
+        margin: String(d.get('margin')),
+        voice: !!d.get('voice'),
+        vibrate: !!d.get('vibrate'),
+      });
+      persist();
+      go('m05');
+    }
+    if (id === 'edit-form') {
+      Object.assign(current(), {
+        title: String(d.get('title')).trim(),
+        time: String(d.get('time')),
+        note: String(d.get('note')).trim(),
+        frequency: String(d.get('frequency')),
+      });
+      persist();
+      toast('Cambios guardados localmente.');
+      go('m06');
+    }
+    if (id === 'support-form') {
+      state.pendingContact = {
+        name: String(d.get('name')).trim(),
+        role: String(d.get('role')),
+        contact: String(d.get('contact')).trim(),
+      };
+      go('m13');
+    }
+  });
+  window.addEventListener('hashchange', render);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') document.querySelector('.modal-bg')?.remove();
+  });
+  render();
 })();
